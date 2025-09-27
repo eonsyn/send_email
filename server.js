@@ -11,20 +11,31 @@ app.use(cors());
 // Nodemailer transporter
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_PORT == 465,
+  port: Number(process.env.SMTP_PORT),
+  secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for others
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
 });
 
-// API route
+// Health check route
+app.get("/", (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "📧 Email server is running",
+  });
+});
+
+// Send email route
 app.post("/send-email", async (req, res) => {
   const { to, subject, text, html, from } = req.body;
 
   if (!to || !subject || (!text && !html)) {
-    return res.status(400).json({ success: false, message: "Missing fields" });
+    return res.status(400).json({ 
+      success: false, 
+      message: "Missing required fields: to, subject, and text or html." 
+    });
   }
 
   try {
@@ -44,4 +55,6 @@ app.post("/send-email", async (req, res) => {
 });
 
 const PORT = 4000;
-app.listen(PORT, () => console.log(`📧 Email server running on http://localhost:${PORT}`));
+app.listen(PORT, () => 
+  console.log(`📧 Email server running on http://localhost:${PORT}`)
+);
