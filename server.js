@@ -40,7 +40,7 @@ app.post("/send-email", async (req, res) => {
 
   try {
     const info = await transporter.sendMail({
-      from: from || `"Tailor Me" <${process.env.SMTP_USER}>`,
+      from: `${from} <${process.env.SMTP_USER}>` || `"Tailor Me" <${process.env.SMTP_USER}>`,
       to,
       subject,
       text,
